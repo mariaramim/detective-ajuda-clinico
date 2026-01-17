@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1,
+    "title": "Copo derramado no chão",
+    "context": "casa",
+    "difficulty": 1,
+    "tags": ["ajuda_pratica", "seguranca"],
+    "image": "assets/cards/001.png",
+    "keyClues": ["líquido no chão", "pessoa preocupada", "risco de escorregar"],
+    "targetAction": "Oferecer pano/papel e sinalizar o chão",
+    "targetPhrase": "Quer ajuda pra limpar?",
+    "needsAdult": false,
+    "adultType": ""
+  },
+  {
+    "id": 2,
+    "title": "Perdeu o brinquedo",
+    "context": "casa",
+    "difficulty": 1,
+    "tags": ["emocao", "iniciativa"],
+    "image": "assets/cards/002.png",
+    "keyClues": ["choro", "procura com os olhos", "frustração"],
+    "targetAction": "Perguntar o que aconteceu e ajudar a procurar",
+    "targetPhrase": "O que você perdeu? Vamos procurar juntos?",
+    "needsAdult": false,
+    "adultType": ""
+  },
+  {
+    "id": 3,
+    "title": "Sacolas pesadas",
+    "context": "rua",
+    "difficulty": 1,
+    "tags": ["ajuda_pratica", "cortesia"],
+    "image": "assets/cards/003.png",
+    "keyClues": ["sacolas grandes", "postura cansada", "passos lentos"],
+    "targetAction": "Oferecer carregar uma sacola e abrir a porta",
+    "targetPhrase": "Posso levar essa aqui?",
+    "needsAdult": false,
+    "adultType": ""
+  }
+]
