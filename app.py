@@ -12,10 +12,10 @@ st.set_page_config(page_title="Detective da Ajuda — Clínico", layout="wide")
 
 # ✅ Logo pequena e elegante na sidebar
 LOGO_PATH = os.path.join("assets", "branding", "logo.png")
-with st.sidebar:
-    if os.path.exists(LOGO_PATH):
-        st.image(LOGO_PATH, width=90)
-    st.markdown("---")
+if os.path.exists(LOGO_PATH):
+    st.sidebar.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
+    st.sidebar.image(LOGO_PATH, width=85)  # delicado: 70–95
+    st.sidebar.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
 DB_PATH = os.path.join("db", "clinic.db")
 CARDS_PATH = os.path.join("data", "cards.json")
