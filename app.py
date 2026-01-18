@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 import sqlite3
@@ -7,36 +8,50 @@ import pandas as pd
 import streamlit as st
 from PIL import Image
 
-# ✅ Logo na sidebar (maior, centralizada e no topo)
+# ✅ PRECISA ser o primeiro comando Streamlit
+st.set_page_config(page_title="Detective da Ajuda — Clínico", layout="wide")
+
+
+# =========================
+# Branding (logo na sidebar)
+# =========================
 LOGO_PATH = os.path.join("assets", "branding", "logo.png")
+LOGO_WIDTH = 260  # ajuste aqui (ex.: 240, 260, 280)
 
-st.markdown("""
-<style>
-/* centraliza imagem dentro da sidebar */
-[data-testid="stSidebar"] img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-/* sobe o conteúdo da sidebar */
-section[data-testid="stSidebar"] > div {
-    padding-top: 0.2rem;
-}
-</style>
-""", unsafe_allow_html=True)
-
-if os.path.exists(LOGO_PATH):
-    st.sidebar.image(LOGO_PATH, width=200)
+def render_sidebar_logo():
+    # deixa mais "no topo"
     st.sidebar.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
 
-st.sidebar.markdown("---")
+    if os.path.exists(LOGO_PATH):
+        with open(LOGO_PATH, "rb") as f:
+            b64 = base64.b64encode(f.read()).decode("utf-8")
 
+        st.sidebar.markdown(
+            f"""
+            <div style="text-align:center; padding-top:0px; padding-bottom:8px;">
+                <img src="data:image/png;base64,{b64}"
+                     style="width:{LOGO_WIDTH}px; max-width:100%; height:auto; display:inline-block;"
+                     alt="Tecnoneuro" />
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    st.sidebar.markdown("---")
+
+render_sidebar_logo()
+
+
+# =========================
+# Paths e DB
+# =========================
 DB_PATH = os.path.join("db", "clinic.db")
 CARDS_PATH = os.path.join("data", "cards.json")
 
 def get_conn():
     os.makedirs("db", exist_ok=True)
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+
     conn.execute("""
         CREATE TABLE IF NOT EXISTS clients (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,6 +61,7 @@ def get_conn():
             created_at TEXT NOT NULL
         )
     """)
+
     conn.execute("""
         CREATE TABLE IF NOT EXISTS sessions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,6 +72,7 @@ def get_conn():
             FOREIGN KEY(client_id) REFERENCES clients(id)
         )
     """)
+
     conn.execute("""
         CREATE TABLE IF NOT EXISTS attempts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,6 +90,7 @@ def get_conn():
             FOREIGN KEY(session_id) REFERENCES sessions(id)
         )
     """)
+
     conn.commit()
     return conn
 
@@ -81,8 +99,8 @@ def load_cards():
     with open(CARDS_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def card_image(path):
-    return Image.open(path) if os.path.exists(path) else None
+def card_image(path: str):
+    return Image.open(path) if path and os.path.exists(path) else None
 
 def total_score(detection, clues, cog_empathy, action, communication, safety):
     return int(detection + clues + cog_empathy + action + communication + safety)
@@ -91,9 +109,17 @@ cards = load_cards()
 cards_by_id = {c["id"]: c for c in cards}
 conn = get_conn()
 
+
+# =========================
+# Navegação
+# =========================
 st.sidebar.title("Navegação")
 page = st.sidebar.radio("Ir para:", ["Pacientes", "Sessão", "Relatórios"])
 
+
+# =========================
+# Página: Pacientes
+# =========================
 if page == "Pacientes":
     st.title("Pacientes")
 
@@ -133,6 +159,10 @@ if page == "Pacientes":
         )
         st.write("Paciente ativo:", st.session_state.active_client_id)
 
+
+# =========================
+# Página: Sessão
+# =========================
 elif page == "Sessão":
     st.title("Sessão")
 
@@ -153,12 +183,14 @@ elif page == "Sessão":
     hint_level = st.selectbox("Nível de dicas usado nesta tentativa", [0, 1, 2, 3], index=0)
 
     st.subheader("Escolher cartas da sessão")
-    default_ids = [c["id"] for c in cards[:10]]
+
+    default_ids = [c["id"] for c in cards[:10]] if len(cards) >= 10 else [c["id"] for c in cards]
     selected_ids = st.multiselect(
         "Cartas (IDs)",
         options=[c["id"] for c in cards],
         default=default_ids
     )
+
     if not selected_ids:
         st.info("Selecione pelo menos uma carta.")
         st.stop()
@@ -169,7 +201,7 @@ elif page == "Sessão":
         st.session_state.session_attempts = {}
 
     max_idx = len(selected_ids) - 1
-    colA, colB, colC = st.columns([1,1,2])
+    colA, colB, colC = st.columns([1, 1, 2])
     with colA:
         if st.button("⬅️ Anterior") and st.session_state.session_idx > 0:
             st.session_state.session_idx -= 1
@@ -183,15 +215,20 @@ elif page == "Sessão":
     card = cards_by_id[current_id]
 
     st.divider()
-    left, right = st.columns([2, 1])
+
+    # ✅ aqui é o ajuste principal: estímulo grande como antes
+    # ✅ coluna da esquerda mais larga para o estímulo (3:1)
+    left, right = st.columns([3, 1])
 
     with left:
         st.subheader(f"Carta {card['id']} — {card['title']}")
-        img = card_image(card["image"])
+        img = card_image(card.get("image", ""))
+
         if img:
+            # VOLTA ao comportamento anterior: ocupa largura disponível da coluna
             st.image(img, use_column_width=True)
         else:
-            st.warning(f"Imagem não encontrada: {card['image']}")
+            st.warning(f"Imagem não encontrada: {card.get('image','')}")
 
         with st.expander("Pistas e resposta-alvo (terapeuta)"):
             st.write("Pistas:", " • ".join(card.get("keyClues", [])))
@@ -269,6 +306,10 @@ elif page == "Sessão":
         st.session_state.session_attempts = {}
         st.session_state.session_idx = 0
 
+
+# =========================
+# Página: Relatórios
+# =========================
 elif page == "Relatórios":
     st.title("Relatórios")
 
