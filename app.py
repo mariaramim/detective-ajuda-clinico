@@ -29,7 +29,7 @@ section[data-testid="stSidebar"] > div {
 """, unsafe_allow_html=True)
 
 if os.path.exists(LOGO_PATH):
-    st.sidebar.image(LOGO_PATH, width=120)  # ajuste: 110–150
+   st.sidebar.image(LOGO_PATH, width=200)
     st.sidebar.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
 
 
