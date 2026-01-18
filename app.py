@@ -7,7 +7,15 @@ import pandas as pd
 import streamlit as st
 from PIL import Image
 
+# ✅ tem que ser o PRIMEIRO comando do Streamlit
 st.set_page_config(page_title="Detective da Ajuda — Clínico", layout="wide")
+
+# ✅ Logo pequena e elegante na sidebar
+LOGO_PATH = os.path.join("assets", "branding", "logo.png")
+with st.sidebar:
+    if os.path.exists(LOGO_PATH):
+        st.image(LOGO_PATH, width=90)
+    st.markdown("---")
 
 DB_PATH = os.path.join("db", "clinic.db")
 CARDS_PATH = os.path.join("data", "cards.json")
