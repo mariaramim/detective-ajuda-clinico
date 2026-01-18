@@ -10,12 +10,28 @@ from PIL import Image
 # ✅ tem que ser o PRIMEIRO comando do Streamlit
 st.set_page_config(page_title="Detective da Ajuda — Clínico", layout="wide")
 
-# ✅ Logo pequena e elegante na sidebar
+# ✅ Logo (maior, centralizada e no topo da sidebar)
 LOGO_PATH = os.path.join("assets", "branding", "logo.png")
+
+st.markdown("""
+<style>
+/* centraliza imagens dentro da sidebar */
+[data-testid="stSidebar"] img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* reduz o padding superior da sidebar (sobe a logo) */
+section[data-testid="stSidebar"] > div {
+    padding-top: 0.5rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
 if os.path.exists(LOGO_PATH):
+    st.sidebar.image(LOGO_PATH, width=120)  # ajuste: 110–150
     st.sidebar.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
-    st.sidebar.image(LOGO_PATH, width=85)  # delicado: 70–95
-    st.sidebar.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+
 
 DB_PATH = os.path.join("db", "clinic.db")
 CARDS_PATH = os.path.join("data", "cards.json")
