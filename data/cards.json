@@ -21,7 +21,7 @@
   },
   {
     "id": 2,
-    "title": "Perdeu o brinquedo",
+    "title": "Irmão menor chorando porque perdeu brinquedo",
     "context": "casa",
     "difficulty": 1,
     "tags": [
@@ -41,7 +41,7 @@
   },
   {
     "id": 3,
-    "title": "Sacolas pesadas",
+    "title": "Avó com sacolas pesadas",
     "context": "rua",
     "difficulty": 1,
     "tags": [
@@ -61,7 +61,7 @@
   },
   {
     "id": 4,
-    "title": "Carta 4",
+    "title": "Pai/mãe procurando a chave, atrasado",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -74,7 +74,7 @@
   },
   {
     "id": 5,
-    "title": "Carta 5",
+    "title": "Queimadura leve na cozinha (encostou em panela)",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -87,7 +87,7 @@
   },
   {
     "id": 6,
-    "title": "Carta 6",
+    "title": "Pessoa tentando alcançar algo alto",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -100,7 +100,7 @@
   },
   {
     "id": 7,
-    "title": "Carta 7",
+    "title": "Alguém triste no sofá, quieto",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -113,7 +113,7 @@
   },
   {
     "id": 8,
-    "title": "Carta 8",
+    "title": "Criança com nariz escorrendo/espirros",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -126,7 +126,7 @@
   },
   {
     "id": 9,
-    "title": "Carta 9",
+    "title": "Pessoa com dor de cabeça (mãos na testa)",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -139,7 +139,7 @@
   },
   {
     "id": 10,
-    "title": "Carta 10",
+    "title": "Animal de estimação preso/assustado (coleira enroscou)",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -152,7 +152,7 @@
   },
   {
     "id": 11,
-    "title": "Carta 11",
+    "title": "Colega derruba lápis e cadernos",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -165,7 +165,7 @@
   },
   {
     "id": 12,
-    "title": "Carta 12",
+    "title": "Colega novo perdido na escola",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -178,7 +178,7 @@
   },
   {
     "id": 13,
-    "title": "Carta 13",
+    "title": "Alguém não entende a tarefa",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -191,7 +191,7 @@
   },
   {
     "id": 14,
-    "title": "Carta 14",
+    "title": "Colega isolado no recreio",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -204,7 +204,7 @@
   },
   {
     "id": 15,
-    "title": "Carta 15",
+    "title": "Professor carregando muitos livros",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -217,7 +217,7 @@
   },
   {
     "id": 16,
-    "title": "Carta 16",
+    "title": "Colega com cadarço desamarrado",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -230,7 +230,7 @@
   },
   {
     "id": 17,
-    "title": "Carta 17",
+    "title": "Colega sofre zoação/empurrão leve",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -243,7 +243,7 @@
   },
   {
     "id": 18,
-    "title": "Carta 18",
+    "title": "Alguém com fome/esqueceu lanche",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -256,7 +256,7 @@
   },
   {
     "id": 19,
-    "title": "Carta 19",
+    "title": "Colega deixa cair água e o chão fica escorregadio",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -269,7 +269,7 @@
   },
   {
     "id": 20,
-    "title": "Carta 20",
+    "title": "Aluno com crise sensorial (barulho incomodando)",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -282,7 +282,7 @@
   },
   {
     "id": 21,
-    "title": "Carta 21",
+    "title": "Pessoa deixa cair moedas/cartão",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -295,7 +295,7 @@
   },
   {
     "id": 22,
-    "title": "Carta 22",
+    "title": "Idoso atravessando com dificuldade",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -308,7 +308,7 @@
   },
   {
     "id": 23,
-    "title": "Carta 23",
+    "title": "Cadeirante diante de rampa bloqueada",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -321,7 +321,7 @@
   },
   {
     "id": 24,
-    "title": "Carta 24",
+    "title": "Mãe/pai com carrinho de bebê em degrau",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -334,7 +334,7 @@
   },
   {
     "id": 25,
-    "title": "Carta 25",
+    "title": "Pessoa chorando no banco da praça",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -347,7 +347,7 @@
   },
   {
     "id": 26,
-    "title": "Carta 26",
+    "title": "Criança perdida procurando responsável",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -360,7 +360,7 @@
   },
   {
     "id": 27,
-    "title": "Carta 27",
+    "title": "Cachorro na rua quase indo para a pista",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -373,7 +373,7 @@
   },
   {
     "id": 28,
-    "title": "Carta 28",
+    "title": "Pessoa carregando caixa grande sem enxergar",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -386,7 +386,7 @@
   },
   {
     "id": 29,
-    "title": "Carta 29",
+    "title": "Alguém tropeça e deixa cair compras",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -399,7 +399,7 @@
   },
   {
     "id": 30,
-    "title": "Carta 30",
+    "title": "Pessoa com dificuldade para ler placa/horário (confusa)",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -412,7 +412,7 @@
   },
   {
     "id": 31,
-    "title": "Carta 31",
+    "title": "No ônibus: pessoa em pé com dificuldade",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -425,7 +425,7 @@
   },
   {
     "id": 32,
-    "title": "Carta 32",
+    "title": "Alguém com mala pesada na escada do metrô",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -438,7 +438,7 @@
   },
   {
     "id": 33,
-    "title": "Carta 33",
+    "title": "Pessoa derruba bengala",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -451,7 +451,7 @@
   },
   {
     "id": 34,
-    "title": "Carta 34",
+    "title": "Alguém confuso com bilhete/catraca",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -464,7 +464,7 @@
   },
   {
     "id": 35,
-    "title": "Carta 35",
+    "title": "Fila: pessoa deixa cair carteira/documento",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -477,7 +477,7 @@
   },
   {
     "id": 36,
-    "title": "Carta 36",
+    "title": "Restaurante: pessoa derruba talher e parece constrangida",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -490,7 +490,7 @@
   },
   {
     "id": 37,
-    "title": "Carta 37",
+    "title": "Banheiro público: tenta abrir porta errada e se confunde",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -503,7 +503,7 @@
   },
   {
     "id": 38,
-    "title": "Carta 38",
+    "title": "Cinema/teatro: pessoa procura o assento e atrapalha passagem",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -516,7 +516,7 @@
   },
   {
     "id": 39,
-    "title": "Carta 39",
+    "title": "Loja: pessoa não alcança produto e tenta esticar",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -529,7 +529,7 @@
   },
   {
     "id": 40,
-    "title": "Carta 40",
+    "title": "Farmácia: pessoa idosa confusa com receita",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -542,7 +542,7 @@
   },
   {
     "id": 41,
-    "title": "Carta 41",
+    "title": "Colega com pilha de papéis caindo",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -555,7 +555,7 @@
   },
   {
     "id": 42,
-    "title": "Carta 42",
+    "title": "Colega perdido em reunião (não entende siglas)",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -568,7 +568,7 @@
   },
   {
     "id": 43,
-    "title": "Carta 43",
+    "title": "Pessoa com dificuldade para abrir pote/embalagem",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -581,7 +581,7 @@
   },
   {
     "id": 44,
-    "title": "Carta 44",
+    "title": "Cliente irritado por confusão simples (procura setor)",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -594,7 +594,7 @@
   },
   {
     "id": 45,
-    "title": "Carta 45",
+    "title": "Colega com sinais de exaustão (muito calado, postura caída)",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -607,7 +607,7 @@
   },
   {
     "id": 46,
-    "title": "Carta 46",
+    "title": "Crise de ansiedade (respiração curta)",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -620,7 +620,7 @@
   },
   {
     "id": 47,
-    "title": "Carta 47",
+    "title": "Derruba bandeja na praça de alimentação",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -633,7 +633,7 @@
   },
   {
     "id": 48,
-    "title": "Carta 48",
+    "title": "Dificuldade auditiva: pede repetição",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -646,7 +646,7 @@
   },
   {
     "id": 49,
-    "title": "Carta 49",
+    "title": "Dor súbita (segura peito/abdômen e senta)",
     "context": "",
     "difficulty": 1,
     "tags": [],
@@ -659,7 +659,7 @@
   },
   {
     "id": 50,
-    "title": "Carta 50",
+    "title": "Queda leve de bicicleta/patinete",
     "context": "",
     "difficulty": 1,
     "tags": [],
