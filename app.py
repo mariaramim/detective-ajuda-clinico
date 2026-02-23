@@ -18,6 +18,9 @@ LOGO_PATH = os.path.join("assets", "branding", "logo.png")
 LOGO_WIDTH = 260  # ajuste aqui (ex.: 240, 260, 280)
 
 def render_sidebar_logo():
+    if st.sidebar.button("🔄 Recarregar cartas"):
+    st.cache_data.clear()
+    st.rerun()
     # um pequeno respiro no topo
     st.sidebar.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
 
@@ -92,8 +95,14 @@ def get_conn():
     conn.commit()
     return conn
 
-@st.cache_data
-def load_cards():
+def _cards_mtime() -> float:
+    try:
+        return os.path.getmtime(CARDS_PATH)
+    except OSError:
+        return 0.0
+
+@st.cache_data(show_spinner=False)
+def load_cards(_mtime: float):
     with open(CARDS_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -113,7 +122,7 @@ def get_card_title(card: dict) -> str:
             return v.strip()
     return "(sem título)"
 
-cards = load_cards()
+cards = load_cards(_cards_mtime())
 cards_by_id = {c.get("id"): c for c in cards if c.get("id") is not None}
 conn = get_conn()
 
