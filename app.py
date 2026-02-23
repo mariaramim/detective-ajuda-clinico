@@ -11,7 +11,6 @@ from PIL import Image
 # ✅ PRECISA ser o primeiro comando Streamlit
 st.set_page_config(page_title="Detective da Ajuda — Clínico", layout="wide")
 
-
 # =========================
 # Branding (logo na sidebar)
 # =========================
@@ -19,7 +18,7 @@ LOGO_PATH = os.path.join("assets", "branding", "logo.png")
 LOGO_WIDTH = 260  # ajuste aqui (ex.: 240, 260, 280)
 
 def render_sidebar_logo():
-    # deixa mais "no topo"
+    # um pequeno respiro no topo
     st.sidebar.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
 
     if os.path.exists(LOGO_PATH):
@@ -40,7 +39,6 @@ def render_sidebar_logo():
     st.sidebar.markdown("---")
 
 render_sidebar_logo()
-
 
 # =========================
 # Paths e DB
@@ -105,17 +103,25 @@ def card_image(path: str):
 def total_score(detection, clues, cog_empathy, action, communication, safety):
     return int(detection + clues + cog_empathy + action + communication + safety)
 
-cards = load_cards()
-cards_by_id = {c["id"]: c for c in cards}
-conn = get_conn()
+def get_card_title(card: dict) -> str:
+    """
+    Deixa o app robusto: se o JSON tiver 'title' ou 'titulo' ou 'name', etc.
+    """
+    for k in ["title", "titulo", "name", "nome", "scenario", "cenario", "heading"]:
+        v = card.get(k)
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+    return "(sem título)"
 
+cards = load_cards()
+cards_by_id = {c.get("id"): c for c in cards if c.get("id") is not None}
+conn = get_conn()
 
 # =========================
 # Navegação
 # =========================
 st.sidebar.title("Navegação")
 page = st.sidebar.radio("Ir para:", ["Pacientes", "Sessão", "Relatórios", "Manual"])
-
 
 # =========================
 # Página: Pacientes
@@ -159,7 +165,6 @@ if page == "Pacientes":
         )
         st.write("Paciente ativo:", st.session_state.active_client_id)
 
-
 # =========================
 # Página: Sessão
 # =========================
@@ -184,10 +189,13 @@ elif page == "Sessão":
 
     st.subheader("Escolher cartas da sessão")
 
-    default_ids = [c["id"] for c in cards[:10]] if len(cards) >= 10 else [c["id"] for c in cards]
+    default_ids = [c.get("id") for c in cards[:10] if c.get("id") is not None]
+    if not default_ids:
+        default_ids = [c.get("id") for c in cards if c.get("id") is not None]
+
     selected_ids = st.multiselect(
         "Cartas (IDs)",
-        options=[c["id"] for c in cards],
+        options=[c.get("id") for c in cards if c.get("id") is not None],
         default=default_ids
     )
 
@@ -212,26 +220,25 @@ elif page == "Sessão":
         st.write(f"Carta {st.session_state.session_idx + 1} de {len(selected_ids)}")
 
     current_id = selected_ids[st.session_state.session_idx]
-    card = cards_by_id[current_id]
+    card = cards_by_id.get(current_id, {})
 
     st.divider()
 
-    # ✅ aqui é o ajuste principal: estímulo grande como antes
-    # ✅ coluna da esquerda mais larga para o estímulo (3:1)
+    # ✅ Estímulo grande (como antes): esquerda bem larga
     left, right = st.columns([3, 1])
 
     with left:
-        st.subheader(f"Carta {card['id']} — {card['title']}")
-        img = card_image(card.get("image", ""))
+        title = get_card_title(card)
+        st.subheader(f"Carta {current_id} — {title}")
 
+        img = card_image(card.get("image", ""))
         if img:
-            # VOLTA ao comportamento anterior: ocupa largura disponível da coluna
             st.image(img, use_column_width=True)
         else:
             st.warning(f"Imagem não encontrada: {card.get('image','')}")
 
         with st.expander("Pistas e resposta-alvo (terapeuta)"):
-            st.write("Pistas:", " • ".join(card.get("keyClues", [])))
+            st.write("Pistas:", " • ".join(card.get("keyClues", []) or []))
             st.write("Ação-alvo:", card.get("targetAction", ""))
             st.write("Frase-alvo:", card.get("targetPhrase", ""))
             if card.get("needsAdult"):
@@ -306,7 +313,6 @@ elif page == "Sessão":
         st.session_state.session_attempts = {}
         st.session_state.session_idx = 0
 
-
 # =========================
 # Página: Relatórios
 # =========================
@@ -349,6 +355,10 @@ elif page == "Relatórios":
     st.subheader("Exportar CSV")
     csv = df_att.to_csv(index=False).encode("utf-8")
     st.download_button("Baixar CSV", csv, file_name="relatorio_tentativas.csv", mime="text/csv")
+
+# =========================
+# Página: Manual (Opção 1)
+# =========================
 elif page == "Manual":
     st.title("Manual do Terapeuta — Detective da Ajuda (Clínico)")
     st.caption("Versão clínica (consulta rápida).")
@@ -385,147 +395,56 @@ O paciente é o **respondente ativo**:
 
 ---
 
-## 3) Fluxo do app (o que cada página faz)
+## 3) Fluxo do app
 
 ### A) Pacientes
-Serve para:
-- criar um paciente com **nome/código** (evitar dados sensíveis);
-- selecionar o “paciente ativo” para que sessão e relatórios fiquem vinculados.
-
-Boas práticas:
-- em “observações”, registre apenas dados clínicos necessários.
+- cria um paciente com **nome/código** (evitar dados sensíveis);
+- seleciona o “paciente ativo” para vincular sessão e relatórios.
 
 ### B) Sessão
-Passo a passo recomendado:
 1. Confirme o *Paciente ativo*.
-2. Escolha o **Modo** (treino guiado / independente / avaliação).
+2. Escolha o **Modo**.
 3. Defina o **Nível de dicas** (0–3).
-4. Selecione as **Cartas (IDs)** para trabalhar.
-5. Use **Anterior/Próxima** para navegar.
-6. Para cada carta: conduza, pontue, registre e clique **Salvar tentativa desta carta**.
-7. Ao final: escreva **Notas da sessão** e clique **Salvar sessão**.
+4. Selecione as **Cartas (IDs)**.
+5. Use **Anterior/Próxima**.
+6. Para cada carta: conduza, pontue, registre e **Salvar tentativa desta carta**.
+7. Ao final: **Notas da sessão** → **Salvar sessão**.
 
-**Importante:** “IDs (1,2,3…)” = cartas selecionadas pelo terapeuta. “A, B, C” = cenas/quadros dentro da carta (sequência narrativa).
+**IDs** = cartas escolhidas pelo terapeuta.  
+**A/B/C** = quadros dentro da carta (sequência narrativa).
 
 ### C) Relatórios
-Mostra o histórico:
-- tentativas por carta; médias; tabela completa; exportação em CSV.
+Histórico + médias + tabela + exportação CSV.
 
 ---
 
-## 4) Roteiro clínico por carta (do simples ao complexo)
-
-### Etapa 1 — Detecção (o que aconteceu?)
-Perguntas:
-- “O que está acontecendo aqui?”
-- “O que você vê primeiro?”
-- “Qual é o problema principal?”
-
-### Etapa 2 — Pistas (como você sabe?)
-- “O que na imagem te faz pensar isso?”
-- “Que sinais mostram isso?”
-- “O que mudou do A para o B? e do B para o C?”
-
-### Etapa 3 — Empatia cognitiva (o que pensa/sente?)
-- “Como a pessoa se sente?”
-- “O que ela pode estar pensando?”
-- “O que a outra pessoa entende da situação?”
-
-### Etapa 4 — Ação (o que fazer agora?)
-- “O que você faria?”
-- “Qual seria uma ajuda boa aqui?”
-- “O que NÃO ajudaria?”
-
-### Etapa 5 — Comunicação (o que dizer?)
-- “O que você diria?”
-- “Como pedir ajuda?”
-- “Dá pra falar de um jeito mais calmo/mais claro?”
-
-### Etapa 6 — Segurança/Encaminhamento
-- “Isso precisa de um adulto?”
-- “É perigoso? tem risco?”
-- “Qual adulto e por quê?”
+## 4) Roteiro clínico por carta
+**Detecção → Pistas → Empatia cognitiva → Ação → Comunicação → Segurança/Encaminhamento**
 
 ---
 
 ## 5) Nível de dicas (0–3)
-- **0 = Sem dicas:** resposta espontânea.
-- **1 = Dica leve:** pergunta orientadora.
-- **2 = Dica moderada:** aponta pista específica.
-- **3 = Dica forte/modelagem:** oferece estrutura/opções de resposta.
-
-**Regra de ouro:** registrar o **menor nível de dica** que desbloqueou a resposta.
+0 sem dicas; 1 dica leve; 2 dica moderada; 3 modelagem.
 
 ---
 
-## 6) Critérios de pontuação (guia rápido)
-
-### Detecção (0–2)
-- 0: não entende / confuso
-- 1: parcial / precisa condução
-- 2: claro e preciso
-
-### Pistas (0–2)
-- 0: não usa pistas
-- 1: 1 pista vaga
-- 2: múltiplas pistas relevantes
-
-### Empatia cognitiva (0–2)
-- 0: sem estados mentais
-- 1: nomeia emoção sem integração
-- 2: integra emoção + motivo + perspectiva
-
-### Ação (0–3)
-- 0: não propõe ajuda / inadequada
-- 1: genérica/incompleta
-- 2: adequada e funcional
-- 3: adequada + ajustada (timing/forma/alternativas)
-
-### Comunicação (0–1)
-- 0: sem frase adequada
-- 1: frase adequada e compreensível
-
-### Segurança/Encaminhamento (0–2)
-- 0: não reconhece risco
-- 1: reconhece com ajuda
-- 2: reconhece sozinho + indica encaminhamento
+## 6) Pontuação (guia rápido)
+- Detecção (0–2)
+- Pistas (0–2)
+- Empatia cognitiva (0–2)
+- Ação (0–3)
+- Comunicação (0–1)
+- Segurança/Encaminhamento (0–2)
 
 ---
 
-## 7) Observação clínica (o que registrar)
-Exemplos:
-- “Precisou de dica nível 2 para notar a pista X.”
-- “Respondeu com ação concreta, mas sem frase.”
-- “Empatia melhorou ao comparar A→B.”
-- “Rigidez: repetiu mesma resposta em cartas diferentes.”
-- “Boa generalização: transferiu estratégia de carta anterior.”
-
----
-
-## 8) Estrutura de sessão sugerida (15–30 min)
-- Aquecimento (2 min): 1 carta simples
-- Núcleo (10–20 min): 3–6 cartas
-- Generalização (2–5 min): “isso acontece na vida real quando?”
-- Fechamento (1–2 min): reforço + resumo de estratégia
-
----
-
-## 9) Script pronto (opcional)
-“Vamos olhar essa cena. Primeiro você me diz o que aconteceu. Depois me mostra as pistas. Em seguida, pensamos como cada pessoa se sente e qual ajuda seria boa. No final, você treina uma frase do que diria.”
-
----
-
-## 10) Troubleshooting (quando trava)
-- Só descreve objetos → peça mudança A→B→C (“o que mudou?”)
-- Não fala emoções → ofereça duas opções (“triste ou com raiva?”)
-- Resposta certa mas mecânica → pergunte “por quê?” e peça pistas
-- Acelera e erra → volte ao básico (“me mostra onde você viu isso”)
+## 7) Observação clínica
+Use frases curtas (ex.: “Precisou de dica 2 para notar pista X”).
 """
 
-    # Exibe o manual dentro do app
     st.markdown(manual_md)
 
-    # Botão para baixar o manual (Markdown)
+    # opcional: download (se quiser tirar, eu removo)
     st.download_button(
         "Baixar manual (arquivo .md)",
         data=manual_md.encode("utf-8"),
