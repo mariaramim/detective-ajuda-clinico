@@ -8,7 +8,7 @@ import pandas as pd
 import streamlit as st
 from PIL import Image
 
-# ✅ PRECISA ser o primeiro comando Streamlit
+# ✅ PRECISA ser o primeiro comando do Streamlit
 st.set_page_config(page_title="Detective da Ajuda — Clínico", layout="wide")
 
 # =========================
@@ -18,9 +18,11 @@ LOGO_PATH = os.path.join("assets", "branding", "logo.png")
 LOGO_WIDTH = 260  # ajuste aqui (ex.: 240, 260, 280)
 
 def render_sidebar_logo():
+    # ✅ botão para recarregar (corrigido: indentação)
     if st.sidebar.button("🔄 Recarregar cartas"):
-    st.cache_data.clear()
-    st.rerun()
+        st.cache_data.clear()
+        st.rerun()
+
     # um pequeno respiro no topo
     st.sidebar.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
 
@@ -114,13 +116,13 @@ def total_score(detection, clues, cog_empathy, action, communication, safety):
 
 def get_card_title(card: dict) -> str:
     """
-    Deixa o app robusto: se o JSON tiver 'title' ou 'titulo' ou 'name', etc.
+    Robusto: aceita variações no JSON, mas prioriza 'title'.
     """
     for k in ["title", "titulo", "name", "nome", "scenario", "cenario", "heading"]:
         v = card.get(k)
         if isinstance(v, str) and v.strip():
             return v.strip()
-    return "(sem título)"
+    return f"Carta {card.get('id','?')}"
 
 cards = load_cards(_cards_mtime())
 cards_by_id = {c.get("id"): c for c in cards if c.get("id") is not None}
@@ -202,9 +204,11 @@ elif page == "Sessão":
     if not default_ids:
         default_ids = [c.get("id") for c in cards if c.get("id") is not None]
 
+    options_ids = [c.get("id") for c in cards if c.get("id") is not None]
+
     selected_ids = st.multiselect(
         "Cartas (IDs)",
-        options=[c.get("id") for c in cards if c.get("id") is not None],
+        options=options_ids,
         default=default_ids
     )
 
@@ -233,7 +237,7 @@ elif page == "Sessão":
 
     st.divider()
 
-    # ✅ Estímulo grande (como antes): esquerda bem larga
+    # ✅ estímulo grande como antes
     left, right = st.columns([3, 1])
 
     with left:
@@ -374,86 +378,24 @@ elif page == "Manual":
 
     manual_md = """
 ## 1) Objetivo do aplicativo
-O aplicativo é uma ferramenta de **treino e avaliação clínica** de habilidades socioemocionais e de comunicação a partir de cartas com cenas. Ele ajuda o terapeuta a:
-- selecionar estímulos (cartas) de acordo com o paciente e a meta terapêutica;
-- conduzir a conversa e observar repertórios;
-- registrar pontuação por domínios (detecção, pistas, empatia, ação etc.);
-- gerar histórico e relatórios.
-
----
+O aplicativo é uma ferramenta de **treino e avaliação clínica** de habilidades socioemocionais e de comunicação a partir de cartas com cenas.
 
 ## 2) Papéis na sessão
+**Terapeuta:** seleciona cartas, conduz com dicas graduais, observa e pontua.  
+**Paciente:** descreve, identifica pistas/emoções, propõe ação/frase.
 
-### Papel do terapeuta
-Você é o **condutor e avaliador**:
-- seleciona as cartas (planejamento clínico);
-- define o nível de ajuda (dicas);
-- faz perguntas, oferece pistas graduais e modela linguagem quando necessário;
-- observa e pontua o desempenho do paciente;
-- registra observações clínicas.
+## 3) Fluxo
+Pacientes → Sessão → Relatórios.  
+**IDs** = cartas escolhidas. **A/B/C** = quadros da carta.
 
-### Papel do paciente
-O paciente é o **respondente ativo**:
-- descreve o que está vendo;
-- identifica emoções/pistas;
-- propõe o que fazer/dizer;
-- ajusta respostas conforme recebe dicas;
-- pratica frases e ações alternativas.
-
-**Regra geral:** o terapeuta regula o “nível de estrutura”; o paciente fornece o material (percepção + interpretação + resposta).
-
----
-
-## 3) Fluxo do app
-
-### A) Pacientes
-- cria um paciente com **nome/código** (evitar dados sensíveis);
-- seleciona o “paciente ativo” para vincular sessão e relatórios.
-
-### B) Sessão
-1. Confirme o *Paciente ativo*.
-2. Escolha o **Modo**.
-3. Defina o **Nível de dicas** (0–3).
-4. Selecione as **Cartas (IDs)**.
-5. Use **Anterior/Próxima**.
-6. Para cada carta: conduza, pontue, registre e **Salvar tentativa desta carta**.
-7. Ao final: **Notas da sessão** → **Salvar sessão**.
-
-**IDs** = cartas escolhidas pelo terapeuta.  
-**A/B/C** = quadros dentro da carta (sequência narrativa).
-
-### C) Relatórios
-Histórico + médias + tabela + exportação CSV.
-
----
-
-## 4) Roteiro clínico por carta
-**Detecção → Pistas → Empatia cognitiva → Ação → Comunicação → Segurança/Encaminhamento**
-
----
-
-## 5) Nível de dicas (0–3)
+## 4) Nível de dicas (0–3)
 0 sem dicas; 1 dica leve; 2 dica moderada; 3 modelagem.
 
----
-
-## 6) Pontuação (guia rápido)
-- Detecção (0–2)
-- Pistas (0–2)
-- Empatia cognitiva (0–2)
-- Ação (0–3)
-- Comunicação (0–1)
-- Segurança/Encaminhamento (0–2)
-
----
-
-## 7) Observação clínica
-Use frases curtas (ex.: “Precisou de dica 2 para notar pista X”).
+## 5) Pontuação
+Detecção, Pistas, Empatia, Ação, Comunicação, Segurança.
 """
-
     st.markdown(manual_md)
 
-    # opcional: download (se quiser tirar, eu removo)
     st.download_button(
         "Baixar manual (arquivo .md)",
         data=manual_md.encode("utf-8"),
