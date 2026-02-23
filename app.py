@@ -389,11 +389,10 @@ O paciente é o **respondente ativo**:
 
 ### A) Pacientes
 Serve para:
-- criar um paciente com **apelido/código** (evitar dados sensíveis);
+- criar um paciente com **nome/código** (evitar dados sensíveis);
 - selecionar o “paciente ativo” para que sessão e relatórios fiquem vinculados.
 
 Boas práticas:
-- use um código: “P01”, “Adol_07”, “BV-2026” etc.;
 - em “observações”, registre apenas dados clínicos necessários.
 
 ### B) Sessão
