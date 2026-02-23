@@ -12,16 +12,23 @@ from PIL import Image
 st.set_page_config(page_title="Detective da Ajuda — Clínico", layout="wide")
 
 # =========================
+# Modo DEV (esconde botão)
+# =========================
+# Para ativar: export DEV_MODE=1 (no terminal) ou DEV_MODE="1" no Streamlit Cloud Secrets
+DEV_MODE = os.getenv("DEV_MODE", "0") == "1"
+
+# =========================
 # Branding (logo na sidebar)
 # =========================
 LOGO_PATH = os.path.join("assets", "branding", "logo.png")
 LOGO_WIDTH = 260  # ajuste aqui (ex.: 240, 260, 280)
 
 def render_sidebar_logo():
-    # ✅ botão para recarregar (corrigido: indentação)
-    if st.sidebar.button("🔄 Recarregar cartas"):
-        st.cache_data.clear()
-        st.rerun()
+    # ✅ botão só aparece no modo DEV
+    if DEV_MODE:
+        if st.sidebar.button("🔄 Recarregar cartas"):
+            st.cache_data.clear()
+            st.rerun()
 
     # um pequeno respiro no topo
     st.sidebar.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
