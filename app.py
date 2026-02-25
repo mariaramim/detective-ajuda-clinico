@@ -597,31 +597,173 @@ elif page == "Relatórios":
 # =========================
 elif page == "Manual":
     st.title("Manual do Terapeuta — Detective da Ajuda (Clínico)")
-    st.caption("Versão clínica (consulta rápida).")
 
     manual_md = """
 ## 1) Objetivo do aplicativo
-Ferramenta de **treino e avaliação clínica** de habilidades socioemocionais e comunicação com cartas (cenas).
+O aplicativo é uma ferramenta de treino e avaliação clínica de habilidades socioemocionais e de comunicação a partir de cartas com cenas. Ele ajuda o terapeuta a:
+- selecionar estímulos (cartas) de acordo com o paciente e a meta terapêutica;
+- conduzir a conversa e observar repertórios;
+- registrar pontuação por domínios (detecção, pistas, empatia, ação etc.);
+- gerar histórico e relatórios.
 
 ## 2) Papéis na sessão
-**Terapeuta:** seleciona cartas, conduz com dicas graduais, observa e pontua.  
-**Paciente:** descreve, identifica pistas/emoções, propõe ação/frase.
+### Papel do terapeuta
+Você é o condutor e avaliador:
+- seleciona as cartas (planejamento clínico);
+- define o nível de ajuda (dicas);
+- faz perguntas, oferece pistas graduais e modela linguagem quando necessário;
+- observa e pontua o desempenho do paciente;
+- registra observações clínicas.
 
-## 3) Fluxo
-Pacientes → Sessão → Relatórios.  
-**A/B/C** = quadros da carta.
+### Papel do paciente
+O paciente é o respondente ativo:
+- descreve o que está vendo;
+- identifica emoções/pistas;
+- propõe o que fazer/dizer;
+- ajusta respostas conforme recebe dicas;
+- prática frases e ações alternativas.
 
-## 4) Nível de dicas (0–3)
-0 sem dicas; 1 dica leve; 2 dica moderada; 3 modelagem.
+Em geral: o terapeuta regula o “nível de estrutura”; o paciente fornece o material (percepção + interpretação + resposta).
 
-## 5) Pontuação
-Detecção, Pistas, Empatia, Ação, Comunicação, Segurança.
+## 3) Fluxo do app (o que cada página faz)
+### A) Pacientes
+Serve para:
+- criar um paciente com nome/código;
+- selecionar o “paciente ativo” para que a sessão e os relatórios fiquem vinculados.
+
+Boas práticas:
+- em “observações”, registre apenas dados clínicos necessários.
+
+### B) Sessão
+Aqui acontece a atividade.
+
+Passo a passo recomendado:
+1. Confirme o Paciente ativo (aparece no topo).
+2. Escolha o Modo (treino guiado / independente / avaliação).
+3. Defina o Nível de dicas usado nesta tentativa.
+4. Em Escolher cartas da sessão, selecione os IDs das cartas que você quer trabalhar.
+5. Use Anterior / Próxima para navegar nas cartas.
+6. Para cada carta:
+   - mostre o estímulo ao paciente;
+   - conduza a exploração;
+   - pontue e escreva observações;
+   - clique **Salvar tentativa desta carta**.
+7. Ao final, escreva **Notas da sessão** e clique **Salvar sessão**.
+
+Importante: “IDs (1,2,3…)” = cartas selecionadas pelo terapeuta.  
+“A, B, C” são as cenas/quadros dentro da carta (a sequência narrativa).
+
+### C) Relatórios
+Mostra o histórico do paciente com:
+- tentativas por carta;
+- médias;
+- tabela completa;
+- exportação em CSV.
+
+## 4) Roteiro clínico para usar em cada carta
+Use sempre do mais simples ao mais complexo:
+
+### Etapa 1 — Detecção (o que aconteceu?)
+Perguntas:
+- “O que está acontecendo aqui?”
+- “O que você vê primeiro?”
+- “Qual é o problema principal?”
+
+### Etapa 2 — Pistas (como você sabe?)
+Perguntas:
+- “O que na imagem te faz pensar isso?”
+- “Que sinais mostram isso? (olhos, boca, corpo, situação)”
+- “O que mudou do A para o B? e do B para o C?”
+
+### Etapa 3 — Empatia cognitiva (o que cada um pensa/sente?)
+Perguntas:
+- “Como a pessoa se sente?”
+- “O que ela pode estar pensando?”
+- “O que a outra pessoa entende da situação?”
+
+### Etapa 4 — Ação (o que fazer agora?)
+Perguntas:
+- “O que você faria se fosse você?”
+- “Qual seria uma ajuda boa aqui?”
+- “O que NÃO ajudaria?”
+
+### Etapa 5 — Comunicação (o que dizer?)
+Perguntas:
+- “O que você diria?”
+- “Como pedir ajuda?”
+- “Dá pra falar de um jeito mais calmo/mais claro?”
+
+### Etapa 6 — Segurança/Encaminhamento (quando precisa adulto?)
+Perguntas:
+- “Isso precisa de um adulto?”
+- “É perigoso? tem risco?”
+- “Qual adulto e por quê?”
+
+## 5) Como usar o “Nível de Dicas” (0–3)
+A ideia é padronizar para ficar comparável entre sessões.
+- **0 = Sem dicas:** paciente responde espontaneamente.
+- **1 = Dica leve:** pergunta orientadora (“olhe o rosto… o que te diz?”).
+- **2 = Dica moderada:** você aponta a pista (“veja o copo no chão… isso muda o quê?”).
+- **3 = Dica forte/modelagem:** você sugere estrutura de resposta ou oferece opções (“você pode dizer ‘vamos limpar juntos’ ou ‘posso ajudar?’”).
+
+Regra de ouro: anote o menor nível de dica que desbloqueou a resposta.
+
+## 6) Critérios de pontuação (como interpretar)
+Você já tem os dados por domínio. Para ficar consistente, use este “guia rápido”:
+
+### Detecção (0–2)
+- **0:** não entende o que aconteceu / descrição confusa  
+- **1:** entende parcialmente ou precisa de condução  
+- **2:** entende claramente e com precisão  
+
+### Pistas (0–2)
+- **0:** não usa pistas visuais/situacionais  
+- **1:** usa 1 pista ou vaga  
+- **2:** usa múltiplas pistas relevantes (detalhes + contexto)  
+
+### Empatia cognitiva (0–2)
+- **0:** não atribui estados mentais / respostas rígidas  
+- **1:** atribui um estado (“triste”) sem integração  
+- **2:** integra emoção + motivo + perspectiva do outro  
+
+### Ação (0–3)
+- **0:** não propõe ajuda / propõe ação inadequada  
+- **1:** ajuda genérica (“sei lá…”) ou incompleta  
+- **2:** ajuda adequada e funcional  
+- **3:** ajuda adequada + ajustada ao outro (timing/forma/alternativas)  
+
+### Comunicação (0–1)
+- **0:** não consegue formular frase adequada  
+- **1:** formula frase adequada e compreensível  
+
+### Segurança/Encaminhamento (0–2)
+- **0:** não reconhece risco/necessidade de adulto quando existe  
+- **1:** reconhece com ajuda  
+- **2:** reconhece sozinho e indica adulto/encaminhamento apropriado  
+
+## 7) O que registrar em “Observação clínica”
+Use frases curtas e úteis. Exemplos:
+- “Precisou de dica nível 2 para notar a pista X.”
+- “Respondeu com ação concreta, mas sem frase.”
+- “Empatia melhorou ao comparar A→B.”
+- “Rigidez: repetiu mesma resposta em cartas diferentes.”
+- “Boa generalização: transferiu estratégia de carta anterior.”
+
+## 8) Estrutura de sessão sugerida (15 a 30 min)
+- Aquecimento (2 min): 1 carta simples
+- Núcleo (10–20 min): 3–6 cartas (dependendo da tolerância)
+- Generalização (2–5 min): “isso acontece na vida real quando?”
+- Fechamento (1–2 min): reforço + resumo de estratégia (“hoje você… percebeu pistas e pediu ajuda assim…”)
+
+## 9) Mini “script” pronto para você falar (opcional)
+Você pode usar literalmente:
+
+“Vamos olhar essa cena. Primeiro você me diz o que aconteceu. Depois me mostra as pistas que te fizeram pensar isso. Em seguida, vamos pensar como cada pessoa está se sentindo e o que seria uma ajuda boa. No final, você treina uma frase que você diria.”
+
+## 10) Solucionando problemas clínicos (o que fazer quando trava)
+- Se o paciente só descreve objetos: peça mudança A→B→C (“o que mudou?”).
+- Se ele não fala emoções: ofereça duas opções (“parece triste ou com raiva?”).
+- Se dá resposta “certa” mas mecânica: pergunte “por quê?” e peça pistas.
+- Se acelera e erra: volte ao básico — “me mostra onde você viu isso”.
 """
     st.markdown(manual_md)
-
-    st.download_button(
-        "Baixar manual (arquivo .md)",
-        data=manual_md.encode("utf-8"),
-        file_name="manual_terapeuta_detective_ajuda.md",
-        mime="text/markdown",
-    )
