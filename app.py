@@ -599,7 +599,8 @@ elif page == "Sessão":
         if not is_eval:
             meta["red_unlocked"] = True
 
-        with st.expander("Caixa do terapeuta — condução (padronização)"):
+        # ✅ Texto ajustado (mais comercial/limpo)
+        with st.expander("Caixa do terapeuta — apoio clínico"):
             clues = get_card_clues(card)
             action_text = get_card_action(card)
             phrase_text = get_card_phrase(card)
@@ -608,7 +609,7 @@ elif page == "Sessão":
             if tags:
                 st.caption("Tags: " + " • ".join(tags))
 
-            st.info("**O que observar (processo):** atenção social, iniciativa, empatia cognitiva, ação funcional, comunicação, segurança.")
+            st.info("**Foco clínico:** atenção social, iniciativa, empatia cognitiva, ação funcional, comunicação e segurança/encaminhamento.")
 
             st.write("**Micro-roteiro (3 passos):**")
             for i, line in enumerate(get_default_micro_script(), start=1):
@@ -616,16 +617,25 @@ elif page == "Sessão":
 
             st.caption("**Regra prática:** 1 pergunta + esperar; se necessário, 1 reformulação; depois prompts graduados.")
 
+            st.write("**Quando o paciente travar (sequência):**")
+            st.write("1) Repetir a pergunta (uma vez) • 2) 1 prompt 🟢 • 3) 1 prompt 🟡 • 4) se necessário, liberar 🔴 (registrar)")
+
             c1, c2, c3, c4 = st.columns(4)
             c1.metric("🟢 Prompts", meta["prompts_green"])
             c2.metric("🟡 Prompts", meta["prompts_yellow"])
-            c3.metric("🔴 Dicas", meta["prompts_red"])
+            c3.metric("🔴 Modelagem breve", meta["prompts_red"])
             c4.metric("Reformulação", f"{meta['reformulations']}/1")
 
             st.divider()
 
-            st.write("### 🟢 Pistas (Avaliação OK)")
+            # ✅ Pistas separadas (Avaliação neutras vs Intervenção)
+            st.write("### 🟢 Pistas (Avaliação — neutras)")
+            st.caption("Sinais observáveis da cena (sem sugerir solução).")
             st.write("Pistas:", " • ".join(clues) if clues else "—")
+
+            st.write("### 🟡 Pistas de condução (Intervenção)")
+            st.caption("Use para organizar a exploração quando houver travamento, sem entregar a resposta.")
+            st.write("Foco sugerido:", " • ".join(clues) if clues else "—")
 
             prompts = get_default_prompts()
             green = prompts["green"]
@@ -641,33 +651,48 @@ elif page == "Sessão":
                     st.toast("Prompt 🟢 registrado")
 
             with coly:
-                st.write("**🟡 Direcionamento leve**")
+                st.write("**🟡 Organização da resposta**")
                 st.selectbox("Escolher prompt 🟡", yellow, key=f"sel_y_{current_id}")
                 if st.button("Aplicar 🟡", key=f"btn_y_{current_id}"):
                     meta["prompts_yellow"] += 1
                     st.toast("Prompt 🟡 registrado")
 
+            # ✅ 🔴 no mesmo padrão de 🟢/🟡 (seleciona + aplicar) e gate elegante na Avaliação
             with colr:
-                st.write("**🔴 Dica/modelo**")
+                st.write("**🔴 Modelagem breve**")
+                st.caption("Sugestão explícita (ação/frase). Em Avaliação, fica recolhido por padrão.")
+
                 if is_eval and not meta["red_unlocked"]:
-                    st.warning("Modo Avaliação: Ação/Frase-alvo ficam ocultas por padrão.")
-                    if st.button("Desbloquear dica 🔴 (registrar)", key=f"unlock_red_{current_id}"):
+                    st.info("Avaliação: a modelagem breve fica recolhida por padrão para padronizar a aplicação.")
+                    if st.button("Desbloquear 🔴 (registrar uso)", key=f"unlock_red_{current_id}"):
                         meta["red_unlocked"] = True
-                        st.toast("Dica 🔴 desbloqueada (Avaliação)")
+                        st.toast("🔴 desbloqueado (Avaliação)")
 
                 if (not is_eval) or meta["red_unlocked"]:
-                    st.write("**Ação-alvo (🔴):**", action_text if action_text else "—")
-                    st.write("**Frase-alvo (🔴):**", phrase_text if phrase_text else "—")
+                    red_options = []
+                    if action_text:
+                        red_options.append("Ação-alvo")
+                    if phrase_text:
+                        red_options.append("Frase-alvo")
+                    if not red_options:
+                        red_options = ["(sem modelo disponível)"]
 
-                    colra, colrf = st.columns(2)
-                    with colra:
-                        if st.button("Registrar uso da AÇÃO-alvo 🔴", key=f"btn_red_action_{current_id}"):
-                            meta["prompts_red"] += 1
-                            st.toast("Uso de ação-alvo 🔴 registrado")
-                    with colrf:
-                        if st.button("Registrar uso da FRASE-alvo 🔴", key=f"btn_red_phrase_{current_id}"):
-                            meta["prompts_red"] += 1
-                            st.toast("Uso de frase-alvo 🔴 registrado")
+                    chosen_red = st.selectbox(
+                        "Escolher 🔴",
+                        red_options,
+                        key=f"sel_r_{current_id}"
+                    )
+
+                    if chosen_red == "Ação-alvo":
+                        st.write("**Conteúdo:**", action_text)
+                    elif chosen_red == "Frase-alvo":
+                        st.write("**Conteúdo:**", phrase_text)
+                    else:
+                        st.write("**Conteúdo:** —")
+
+                    if st.button("Aplicar 🔴", key=f"btn_r_{current_id}", disabled=(chosen_red == "(sem modelo disponível)")):
+                        meta["prompts_red"] += 1
+                        st.toast("Uso de 🔴 registrado")
 
             st.divider()
 
@@ -835,7 +860,7 @@ elif page == "Relatórios":
     st.write("Média total:", round(df_att["total"].mean(), 2))
     st.write("Média de dicas (nível selecionado):", round(df_att["hint_level"].mean(), 2))
     if "prompts_red" in df_att.columns:
-        st.write("Média de 🔴 (dicas/modelo usadas):", round(df_att["prompts_red"].mean(), 2))
+        st.write("Média de 🔴 (modelagem breve usada):", round(df_att["prompts_red"].mean(), 2))
     if "response_class" in df_att.columns:
         st.write("% Alternativa válida:", round((df_att["response_class"] == "Alternativa válida").mean() * 100, 1), "%")
 
