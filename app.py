@@ -56,6 +56,19 @@ render_sidebar_logo()
 DB_PATH = os.path.join("db", "clinic.db")
 CARDS_PATH = os.path.join("data", "cards.json")
 
+def ensure_columns(conn, table: str, columns: dict):
+    """
+    columns: {col_name: sql_type}
+    Ex.: {"prompts_green": "INTEGER DEFAULT 0"}
+    """
+    cur = conn.cursor()
+    cur.execute(f"PRAGMA table_info({table})")
+    existing = {row[1] for row in cur.fetchall()}
+    for col, sql_type in columns.items():
+        if col not in existing:
+            cur.execute(f"ALTER TABLE {table} ADD COLUMN {col} {sql_type}")
+    conn.commit()
+
 def get_conn():
     os.makedirs("db", exist_ok=True)
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
@@ -99,6 +112,17 @@ def get_conn():
         )
     """)
 
+    # ✅ Migração: campos para padronização/UX
+    ensure_columns(conn, "attempts", {
+        "prompts_green": "INTEGER DEFAULT 0",
+        "prompts_yellow": "INTEGER DEFAULT 0",
+        "prompts_red": "INTEGER DEFAULT 0",
+        "reformulations": "INTEGER DEFAULT 0",
+        "response_class": "TEXT DEFAULT 'Alvo'",
+        "alt_logic": "TEXT DEFAULT ''",
+        "alt_diff": "TEXT DEFAULT ''"
+    })
+
     conn.commit()
     return conn
 
@@ -129,10 +153,6 @@ def get_card_title(card: dict) -> str:
 # =========================
 # ✅ Overrides (1–50): pistas + ação-alvo + frase-alvo
 # =========================
-# Observação: usei:
-# - Pistas: texto após "Pistas:"
-# - Ação-alvo: texto após "🎯"
-# - Frase-alvo: frase 👶 (infantil), por ser a mais direta p/ treino
 CARD_SUPPORT = {
     1:  {"clues": ["poça no chão", "expressão preocupada", "pano faltando"],
          "action": "Oferecer pano/papel e sinalizar o chão para evitar escorregões",
@@ -291,6 +311,73 @@ CARD_SUPPORT = {
 }
 
 # =========================
+# ✅ Tags por carta (1–50): ⚠ Segurança / 👀 Atenção conjunta / 💬 Comunicação pragmática
+# =========================
+# Regra prática (MVP):
+# - ⚠ Segurança: risco físico/encaminhamento/alto risco de queda/ferimento/emergência
+# - 👀 Atenção conjunta: leitura forte de pista/estado do outro (muito "ver e integrar")
+# - 💬 Comunicação pragmática: quando “como falar” pesa mais (constrangimento/filmar/zoação/fila/privacidade)
+CARD_TAGS = {
+    1:  ["⚠ Segurança", "👀 Atenção conjunta"],
+    2:  ["👀 Atenção conjunta"],
+    3:  ["👀 Atenção conjunta"],
+    4:  ["👀 Atenção conjunta"],
+    5:  ["⚠ Segurança", "👀 Atenção conjunta"],
+    6:  ["⚠ Segurança", "👀 Atenção conjunta"],
+    7:  ["👀 Atenção conjunta", "💬 Comunicação pragmática"],
+    8:  ["👀 Atenção conjunta", "💬 Comunicação pragmática"],
+    9:  ["⚠ Segurança", "👀 Atenção conjunta", "💬 Comunicação pragmática"],
+    10: ["⚠ Segurança", "👀 Atenção conjunta"],
+
+    11: ["💬 Comunicação pragmática", "👀 Atenção conjunta"],
+    12: ["💬 Comunicação pragmática"],
+    13: ["👀 Atenção conjunta", "💬 Comunicação pragmática"],
+    14: ["👀 Atenção conjunta", "💬 Comunicação pragmática"],
+    15: ["⚠ Segurança", "👀 Atenção conjunta"],
+    16: ["⚠ Segurança", "💬 Comunicação pragmática"],
+    17: ["⚠ Segurança", "💬 Comunicação pragmática", "👀 Atenção conjunta"],
+    18: ["💬 Comunicação pragmática", "👀 Atenção conjunta"],
+    19: ["⚠ Segurança", "👀 Atenção conjunta"],
+    20: ["⚠ Segurança", "👀 Atenção conjunta", "💬 Comunicação pragmática"],
+
+    21: ["💬 Comunicação pragmática"],
+    22: ["⚠ Segurança", "💬 Comunicação pragmática"],
+    23: ["⚠ Segurança", "💬 Comunicação pragmática"],
+    24: ["⚠ Segurança", "💬 Comunicação pragmática"],
+    25: ["⚠ Segurança", "👀 Atenção conjunta", "💬 Comunicação pragmática"],
+    26: ["⚠ Segurança", "💬 Comunicação pragmática"],
+    27: ["⚠ Segurança", "👀 Atenção conjunta"],
+    28: ["⚠ Segurança", "💬 Comunicação pragmática"],
+    29: ["⚠ Segurança", "👀 Atenção conjunta", "💬 Comunicação pragmática"],
+    30: ["💬 Comunicação pragmática"],
+
+    31: ["⚠ Segurança", "💬 Comunicação pragmática", "👀 Atenção conjunta"],
+    32: ["⚠ Segurança", "💬 Comunicação pragmática"],
+    33: ["⚠ Segurança", "💬 Comunicação pragmática"],
+    34: ["💬 Comunicação pragmática"],
+    35: ["💬 Comunicação pragmática"],
+    36: ["💬 Comunicação pragmática"],
+    37: ["💬 Comunicação pragmática"],
+    38: ["⚠ Segurança", "💬 Comunicação pragmática"],
+    39: ["⚠ Segurança", "💬 Comunicação pragmática"],
+    40: ["⚠ Segurança", "💬 Comunicação pragmática"],
+
+    41: ["💬 Comunicação pragmática"],
+    42: ["💬 Comunicação pragmática"],
+    43: ["💬 Comunicação pragmática"],
+    44: ["⚠ Segurança", "💬 Comunicação pragmática"],
+    45: ["👀 Atenção conjunta", "💬 Comunicação pragmática"],
+    46: ["⚠ Segurança", "💬 Comunicação pragmática", "👀 Atenção conjunta"],
+    47: ["⚠ Segurança", "💬 Comunicação pragmática", "👀 Atenção conjunta"],
+    48: ["💬 Comunicação pragmática"],
+    49: ["⚠ Segurança", "👀 Atenção conjunta", "💬 Comunicação pragmática"],
+    50: ["⚠ Segurança", "👀 Atenção conjunta", "💬 Comunicação pragmática"],
+}
+
+def get_tags_for_card(card_id: int) -> list[str]:
+    return CARD_TAGS.get(card_id, [])
+
+# =========================
 # Leitura robusta (JSON pode variar)
 # =========================
 def _as_list(v):
@@ -342,6 +429,45 @@ def get_card_phrase(card: dict) -> str:
         if isinstance(v, str) and v.strip():
             return v.strip()
     return ""
+
+# =========================
+# ✅ Meta por carta (contadores / alternativa válida)
+# =========================
+def init_attempt_meta(card_id: int):
+    key = f"meta_{card_id}"
+    if key not in st.session_state:
+        st.session_state[key] = {
+            "prompts_green": 0,
+            "prompts_yellow": 0,
+            "prompts_red": 0,
+            "reformulations": 0,
+            "response_class": "Alvo",
+            "alt_logic": "",
+            "alt_diff": "",
+            "red_unlocked": False
+        }
+    return st.session_state[key]
+
+def get_default_micro_script():
+    return [
+        "O que está acontecendo?",
+        "O que você faria primeiro?",
+        "Por quê? / O que pode acontecer se…?"
+    ]
+
+def get_default_prompts():
+    return {
+        "green": [
+            "Olha com calma a cena.",
+            "O que está acontecendo aqui?",
+            "O que você percebe no rosto/corpo/situação?"
+        ],
+        "yellow": [
+            "Qual seria o primeiro passo?",
+            "Tem mais de uma forma de agir?",
+            "O que dá para fazer agora, em 1 passo?"
+        ]
+    }
 
 cards = load_cards(_cards_mtime())
 cards_by_id = {c.get("id"): c for c in cards if c.get("id") is not None}
@@ -467,18 +593,116 @@ elif page == "Sessão":
         else:
             st.warning(f"Imagem não encontrada: {card.get('image','')}")
 
-        # ✅ agora robusto + garante preenchimento via override 1–50
-        with st.expander("Pistas e resposta-alvo (terapeuta)"):
+        # ✅ Caixa do terapeuta com semáforo + tags + alternativa válida
+        meta = init_attempt_meta(int(current_id))
+        is_eval = (mode == "avaliacao")
+        if not is_eval:
+            meta["red_unlocked"] = True
+
+        with st.expander("Caixa do terapeuta — condução (padronização)"):
             clues = get_card_clues(card)
             action_text = get_card_action(card)
             phrase_text = get_card_phrase(card)
 
+            tags = get_tags_for_card(int(current_id))
+            if tags:
+                st.caption("Tags: " + " • ".join(tags))
+
+            st.info("**O que observar (processo):** atenção social, iniciativa, empatia cognitiva, ação funcional, comunicação, segurança.")
+
+            st.write("**Micro-roteiro (3 passos):**")
+            for i, line in enumerate(get_default_micro_script(), start=1):
+                st.write(f"{i}. {line}")
+
+            st.caption("**Regra prática:** 1 pergunta + esperar; se necessário, 1 reformulação; depois prompts graduados.")
+
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("🟢 Prompts", meta["prompts_green"])
+            c2.metric("🟡 Prompts", meta["prompts_yellow"])
+            c3.metric("🔴 Dicas", meta["prompts_red"])
+            c4.metric("Reformulação", f"{meta['reformulations']}/1")
+
+            st.divider()
+
+            st.write("### 🟢 Pistas (Avaliação OK)")
             st.write("Pistas:", " • ".join(clues) if clues else "—")
-            st.write("Ação-alvo:", action_text if action_text else "—")
-            st.write("Frase-alvo:", phrase_text if phrase_text else "—")
+
+            prompts = get_default_prompts()
+            green = prompts["green"]
+            yellow = prompts["yellow"]
+
+            colg, coly, colr = st.columns(3)
+
+            with colg:
+                st.write("**🟢 Neutro**")
+                st.selectbox("Escolher prompt 🟢", green, key=f"sel_g_{current_id}")
+                if st.button("Aplicar 🟢", key=f"btn_g_{current_id}"):
+                    meta["prompts_green"] += 1
+                    st.toast("Prompt 🟢 registrado")
+
+            with coly:
+                st.write("**🟡 Direcionamento leve**")
+                st.selectbox("Escolher prompt 🟡", yellow, key=f"sel_y_{current_id}")
+                if st.button("Aplicar 🟡", key=f"btn_y_{current_id}"):
+                    meta["prompts_yellow"] += 1
+                    st.toast("Prompt 🟡 registrado")
+
+            with colr:
+                st.write("**🔴 Dica/modelo**")
+                if is_eval and not meta["red_unlocked"]:
+                    st.warning("Modo Avaliação: Ação/Frase-alvo ficam ocultas por padrão.")
+                    if st.button("Desbloquear dica 🔴 (registrar)", key=f"unlock_red_{current_id}"):
+                        meta["red_unlocked"] = True
+                        st.toast("Dica 🔴 desbloqueada (Avaliação)")
+
+                if (not is_eval) or meta["red_unlocked"]:
+                    st.write("**Ação-alvo (🔴):**", action_text if action_text else "—")
+                    st.write("**Frase-alvo (🔴):**", phrase_text if phrase_text else "—")
+
+                    colra, colrf = st.columns(2)
+                    with colra:
+                        if st.button("Registrar uso da AÇÃO-alvo 🔴", key=f"btn_red_action_{current_id}"):
+                            meta["prompts_red"] += 1
+                            st.toast("Uso de ação-alvo 🔴 registrado")
+                    with colrf:
+                        if st.button("Registrar uso da FRASE-alvo 🔴", key=f"btn_red_phrase_{current_id}"):
+                            meta["prompts_red"] += 1
+                            st.toast("Uso de frase-alvo 🔴 registrado")
+
+            st.divider()
+
+            st.write("### Reformulação (limite 1)")
+            if meta["reformulations"] < 1:
+                if st.button("Registrar 1 reformulação", key=f"btn_ref_{current_id}"):
+                    meta["reformulations"] += 1
+                    st.toast("Reformulação registrada")
+            else:
+                st.caption("Limite atingido. Use prompts graduados.")
+
+            st.divider()
+
+            st.write("### Classificação da resposta do paciente")
+            meta["response_class"] = st.radio(
+                "Marcar como:",
+                ["Alvo", "Parcial", "Alternativa válida", "Inadequada"],
+                index=["Alvo", "Parcial", "Alternativa válida", "Inadequada"].index(meta.get("response_class", "Alvo")),
+                key=f"resp_class_{current_id}"
+            )
+
+            if meta["response_class"] == "Alternativa válida":
+                meta["alt_logic"] = st.text_input(
+                    "Qual foi a lógica? (curto)",
+                    value=meta.get("alt_logic", ""),
+                    key=f"alt_logic_{current_id}"
+                )
+                meta["alt_diff"] = st.text_input(
+                    "Em que difere do alvo? (curto)",
+                    value=meta.get("alt_diff", ""),
+                    key=f"alt_diff_{current_id}"
+                )
 
             if card.get("needsAdult"):
-                st.write("Encaminhar:", card.get("adultType", "adulto responsável"))
+                st.warning(f"Encaminhar: {card.get('adultType', 'adulto responsável')}")
 
     with right:
         st.subheader("Pontuação")
@@ -495,8 +719,10 @@ elif page == "Sessão":
         note = st.text_area("Observação clínica (opcional)", height=80)
 
         if st.button("Salvar tentativa desta carta"):
+            meta = init_attempt_meta(int(current_id))
+
             st.session_state.session_attempts[current_id] = dict(
-                card_id=current_id,
+                card_id=int(current_id),
                 hint_level=int(hint_level),
                 detection=int(detection),
                 clues=int(clues_score),
@@ -505,7 +731,16 @@ elif page == "Sessão":
                 communication=int(comm),
                 safety=int(safety),
                 total=int(total),
-                notes=note.strip()
+                notes=note.strip(),
+
+                # ✅ NOVO (UX padronização)
+                prompts_green=int(meta["prompts_green"]),
+                prompts_yellow=int(meta["prompts_yellow"]),
+                prompts_red=int(meta["prompts_red"]),
+                reformulations=int(meta["reformulations"]),
+                response_class=meta.get("response_class", "Alvo"),
+                alt_logic=meta.get("alt_logic", ""),
+                alt_diff=meta.get("alt_diff", "")
             )
             st.success("Tentativa salva (nesta sessão).")
 
@@ -528,8 +763,9 @@ elif page == "Sessão":
         for att in st.session_state.session_attempts.values():
             conn.execute("""
                 INSERT INTO attempts
-                (session_id, card_id, hint_level, detection, clues, cog_empathy, action, communication, safety, total, notes)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?)
+                (session_id, card_id, hint_level, detection, clues, cog_empathy, action, communication, safety, total, notes,
+                 prompts_green, prompts_yellow, prompts_red, reformulations, response_class, alt_logic, alt_diff)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """, (
                 session_id,
                 att["card_id"],
@@ -541,13 +777,25 @@ elif page == "Sessão":
                 att["communication"],
                 att["safety"],
                 att["total"],
-                att["notes"]
+                att["notes"],
+                att.get("prompts_green", 0),
+                att.get("prompts_yellow", 0),
+                att.get("prompts_red", 0),
+                att.get("reformulations", 0),
+                att.get("response_class", "Alvo"),
+                att.get("alt_logic", ""),
+                att.get("alt_diff", ""),
             ))
         conn.commit()
 
         st.success(f"Sessão salva! (ID {session_id})")
         st.session_state.session_attempts = {}
         st.session_state.session_idx = 0
+
+        # ✅ opcional: limpa metas da sessão para não carregar contadores antigos
+        for k in list(st.session_state.keys()):
+            if str(k).startswith("meta_"):
+                del st.session_state[k]
 
 # =========================
 # Página: Relatórios
@@ -569,7 +817,9 @@ elif page == "Relatórios":
     df_att = pd.read_sql_query("""
         SELECT s.id as session_id, s.created_at, s.mode,
                a.card_id, a.hint_level, a.detection, a.clues, a.cog_empathy,
-               a.action, a.communication, a.safety, a.total, a.notes
+               a.action, a.communication, a.safety, a.total, a.notes,
+               a.prompts_green, a.prompts_yellow, a.prompts_red, a.reformulations,
+               a.response_class, a.alt_logic, a.alt_diff
         FROM attempts a
         JOIN sessions s ON s.id = a.session_id
         WHERE s.client_id = ?
@@ -583,7 +833,11 @@ elif page == "Relatórios":
     st.subheader("Resumo")
     st.write("Tentativas:", df_att.shape[0])
     st.write("Média total:", round(df_att["total"].mean(), 2))
-    st.write("Média de dicas:", round(df_att["hint_level"].mean(), 2))
+    st.write("Média de dicas (nível selecionado):", round(df_att["hint_level"].mean(), 2))
+    if "prompts_red" in df_att.columns:
+        st.write("Média de 🔴 (dicas/modelo usadas):", round(df_att["prompts_red"].mean(), 2))
+    if "response_class" in df_att.columns:
+        st.write("% Alternativa válida:", round((df_att["response_class"] == "Alternativa válida").mean() * 100, 1), "%")
 
     st.subheader("Tabela")
     st.dataframe(df_att, use_container_width=True)
