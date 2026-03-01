@@ -184,7 +184,6 @@ CARD_SUPPORT = {
     10: {"clues": ["coleira presa/enroscada", "animal agitado/assustado"],
          "action": "Chamar um adulto/dono e soltar com cuidado, sem assustar",
          "phrase": "Vou chamar um adulto pra ajudar o bichinho."},
-
     11: {"clues": ["itens no chão", "pressa", "constrangimento"],
          "action": "Ajudar a recolher e aliviar a vergonha (sinalizar se corredor cheio)",
          "phrase": "Eu pego esses!"},
@@ -215,7 +214,6 @@ CARD_SUPPORT = {
     20: {"clues": ["tensão", "respiração rápida", "mãos nos ouvidos"],
          "action": "Co-regular e levar para ambiente mais calmo, chamando suporte se necessário",
          "phrase": "Vamos pra um lugar quietinho?"},
-
     21: {"clues": ["objeto no chão", "pessoa procura"],
          "action": "Pegar e devolver imediatamente",
          "phrase": "Caiu isso aqui!"},
@@ -246,7 +244,6 @@ CARD_SUPPORT = {
     30: {"clues": ["franze testa", "aproxima o rosto"],
          "action": "Ajudar a ler/interpretar com calma e apontar informação",
          "phrase": "Quer que eu leia pra você?"},
-
     31: {"clues": ["balança em pé", "idoso/gestante", "olhar cansado"],
          "action": "Ceder lugar e facilitar segurança",
          "phrase": "Quer sentar aqui?"},
@@ -277,7 +274,6 @@ CARD_SUPPORT = {
     40: {"clues": ["papel tremendo", "preocupação"],
          "action": "Encaminhar para farmacêutico (evitar “interpretar” sozinho)",
          "phrase": "Vamos chamar o farmacêutico."},
-
     41: {"clues": ["folhas voando", "tensão"],
          "action": "Ajudar a recolher e organizar com discrição",
          "phrase": "Eu ajudo a juntar."},
@@ -313,10 +309,6 @@ CARD_SUPPORT = {
 # =========================
 # ✅ Tags por carta (1–50): ⚠ Segurança / 👀 Atenção conjunta / 💬 Comunicação pragmática
 # =========================
-# Regra prática (MVP):
-# - ⚠ Segurança: risco físico/encaminhamento/alto risco de queda/ferimento/emergência
-# - 👀 Atenção conjunta: leitura forte de pista/estado do outro (muito "ver e integrar")
-# - 💬 Comunicação pragmática: quando “como falar” pesa mais (constrangimento/filmar/zoação/fila/privacidade)
 CARD_TAGS = {
     1:  ["⚠ Segurança", "👀 Atenção conjunta"],
     2:  ["👀 Atenção conjunta"],
@@ -328,7 +320,6 @@ CARD_TAGS = {
     8:  ["👀 Atenção conjunta", "💬 Comunicação pragmática"],
     9:  ["⚠ Segurança", "👀 Atenção conjunta", "💬 Comunicação pragmática"],
     10: ["⚠ Segurança", "👀 Atenção conjunta"],
-
     11: ["💬 Comunicação pragmática", "👀 Atenção conjunta"],
     12: ["💬 Comunicação pragmática"],
     13: ["👀 Atenção conjunta", "💬 Comunicação pragmática"],
@@ -339,7 +330,6 @@ CARD_TAGS = {
     18: ["💬 Comunicação pragmática", "👀 Atenção conjunta"],
     19: ["⚠ Segurança", "👀 Atenção conjunta"],
     20: ["⚠ Segurança", "👀 Atenção conjunta", "💬 Comunicação pragmática"],
-
     21: ["💬 Comunicação pragmática"],
     22: ["⚠ Segurança", "💬 Comunicação pragmática"],
     23: ["⚠ Segurança", "💬 Comunicação pragmática"],
@@ -350,7 +340,6 @@ CARD_TAGS = {
     28: ["⚠ Segurança", "💬 Comunicação pragmática"],
     29: ["⚠ Segurança", "👀 Atenção conjunta", "💬 Comunicação pragmática"],
     30: ["💬 Comunicação pragmática"],
-
     31: ["⚠ Segurança", "💬 Comunicação pragmática", "👀 Atenção conjunta"],
     32: ["⚠ Segurança", "💬 Comunicação pragmática"],
     33: ["⚠ Segurança", "💬 Comunicação pragmática"],
@@ -361,7 +350,6 @@ CARD_TAGS = {
     38: ["⚠ Segurança", "💬 Comunicação pragmática"],
     39: ["⚠ Segurança", "💬 Comunicação pragmática"],
     40: ["⚠ Segurança", "💬 Comunicação pragmática"],
-
     41: ["💬 Comunicação pragmática"],
     42: ["💬 Comunicação pragmática"],
     43: ["💬 Comunicação pragmática"],
@@ -386,7 +374,6 @@ def _as_list(v):
     if isinstance(v, list):
         return [str(x).strip() for x in v if str(x).strip()]
     if isinstance(v, str):
-        # tenta separar por •, |, ; ou quebra de linha
         parts = []
         for sep in ["•", "|", ";", "\n", ","]:
             if sep in v:
@@ -398,7 +385,6 @@ def _as_list(v):
     return []
 
 def get_card_clues(card: dict) -> list[str]:
-    # prioridade: override
     cid = card.get("id")
     if isinstance(cid, int) and cid in CARD_SUPPORT:
         return CARD_SUPPORT[cid]["clues"]
@@ -407,6 +393,12 @@ def get_card_clues(card: dict) -> list[str]:
         if k in card and card.get(k) not in (None, ""):
             return _as_list(card.get(k))
     return []
+
+def get_eval_clues(card: dict) -> list[str]:
+    return get_card_clues(card)
+
+def get_intervention_clues(card: dict) -> list[str]:
+    return get_card_clues(card)
 
 def get_card_action(card: dict) -> str:
     cid = card.get("id")
@@ -455,17 +447,18 @@ def get_default_micro_script():
         "Por quê? / O que pode acontecer se…?"
     ]
 
-def get_default_prompts():
+# ✅ “Prompt” -> “Pergunta de condução”
+def get_default_conduction_questions():
     return {
         "green": [
-            "Olha com calma a cena.",
+            "Olhe com calma a cena.",
             "O que está acontecendo aqui?",
-            "O que você percebe no rosto/corpo/situação?"
+            "O que você percebe no rosto, no corpo ou na situação?"
         ],
         "yellow": [
             "Qual seria o primeiro passo?",
             "Tem mais de uma forma de agir?",
-            "O que dá para fazer agora, em 1 passo?"
+            "O que dá para fazer agora, em um passo?"
         ]
     }
 
@@ -593,120 +586,105 @@ elif page == "Sessão":
         else:
             st.warning(f"Imagem não encontrada: {card.get('image','')}")
 
-        # ✅ Caixa do terapeuta com semáforo + tags + alternativa válida
         meta = init_attempt_meta(int(current_id))
         is_eval = (mode == "avaliacao")
         if not is_eval:
             meta["red_unlocked"] = True
 
-        # ✅ Texto ajustado (mais comercial/limpo)
         with st.expander("Caixa do terapeuta — apoio clínico"):
-            clues = get_card_clues(card)
-            action_text = get_card_action(card)
-            phrase_text = get_card_phrase(card)
-
             tags = get_tags_for_card(int(current_id))
             if tags:
                 st.caption("Tags: " + " • ".join(tags))
 
-            st.info("**Foco clínico:** atenção social, iniciativa, empatia cognitiva, ação funcional, comunicação e segurança/encaminhamento.")
+            st.caption("Foco de observação: atenção social, iniciativa, empatia cognitiva, ação funcional, comunicação e segurança.")
 
-            st.write("**Micro-roteiro (3 passos):**")
+            st.write("Roteiro curto (3 passos):")
             for i, line in enumerate(get_default_micro_script(), start=1):
                 st.write(f"{i}. {line}")
 
-            st.caption("**Regra prática:** 1 pergunta + esperar; se necessário, 1 reformulação; depois prompts graduados.")
+            st.caption("Regra prática: 1 pergunta + esperar; se necessário, 1 reformulação; depois perguntas de condução graduadas.")
 
-            st.write("**Quando o paciente travar (sequência):**")
-            st.write("1) Repetir a pergunta (uma vez) • 2) 1 prompt 🟢 • 3) 1 prompt 🟡 • 4) se necessário, liberar 🔴 (registrar)")
+            st.write("Quando o paciente travar (sequência):")
+            st.write("1. Repetir a pergunta (uma vez) • 2. 1 pergunta de condução 🟢 • 3. 1 pergunta de condução 🟡 • 4. se necessário, liberar 🔴 (registrar)")
 
             c1, c2, c3, c4 = st.columns(4)
-            c1.metric("🟢 Prompts", meta["prompts_green"])
-            c2.metric("🟡 Prompts", meta["prompts_yellow"])
+            c1.metric("🟢 Perguntas de condução (neutras)", meta["prompts_green"])
+            c2.metric("🟡 Perguntas de condução (direcionadoras)", meta["prompts_yellow"])
             c3.metric("🔴 Modelagem breve", meta["prompts_red"])
             c4.metric("Reformulação", f"{meta['reformulations']}/1")
 
             st.divider()
 
-            # ✅ Pistas separadas (Avaliação neutras vs Intervenção)
-            st.write("### 🟢 Pistas (Avaliação — neutras)")
-            st.caption("Sinais observáveis da cena (sem sugerir solução).")
-            st.write("Pistas:", " • ".join(clues) if clues else "—")
+            eval_clues = get_eval_clues(card)
+            int_clues = get_intervention_clues(card)
 
-            st.write("### 🟡 Pistas de condução (Intervenção)")
-            st.caption("Use para organizar a exploração quando houver travamento, sem entregar a resposta.")
-            st.write("Foco sugerido:", " • ".join(clues) if clues else "—")
+            st.write("Pistas neutras (Avaliação):")
+            st.write(" • ".join(eval_clues) if eval_clues else "—")
 
-            prompts = get_default_prompts()
-            green = prompts["green"]
-            yellow = prompts["yellow"]
+            st.write("Pistas para Intervenção (se aplicável):")
+            st.write(" • ".join(int_clues) if int_clues else "—")
+
+            questions = get_default_conduction_questions()
+            green = questions["green"]
+            yellow = questions["yellow"]
 
             colg, coly, colr = st.columns(3)
 
             with colg:
-                st.write("**🟢 Neutro**")
-                st.selectbox("Escolher prompt 🟢", green, key=f"sel_g_{current_id}")
-                if st.button("Aplicar 🟢", key=f"btn_g_{current_id}"):
+                st.write("🟢 Pergunta de condução neutra")
+                st.selectbox("Selecionar", green, key=f"sel_g_{current_id}")
+                if st.button("Registrar uso 🟢", key=f"btn_g_{current_id}"):
                     meta["prompts_green"] += 1
-                    st.toast("Prompt 🟢 registrado")
+                    st.toast("Pergunta de condução 🟢 registrada")
 
             with coly:
-                st.write("**🟡 Organização da resposta**")
-                st.selectbox("Escolher prompt 🟡", yellow, key=f"sel_y_{current_id}")
-                if st.button("Aplicar 🟡", key=f"btn_y_{current_id}"):
+                st.write("🟡 Pergunta de condução direcionadora")
+                st.selectbox("Selecionar", yellow, key=f"sel_y_{current_id}")
+                if st.button("Registrar uso 🟡", key=f"btn_y_{current_id}"):
                     meta["prompts_yellow"] += 1
-                    st.toast("Prompt 🟡 registrado")
+                    st.toast("Pergunta de condução 🟡 registrada")
 
-            # ✅ 🔴 no mesmo padrão de 🟢/🟡 (seleciona + aplicar) e gate elegante na Avaliação
             with colr:
-                st.write("**🔴 Modelagem breve**")
-                st.caption("Sugestão explícita (ação/frase). Em Avaliação, fica recolhido por padrão.")
+                st.write("🔴 Modelagem breve (estrutura/resposta-modelo)")
+                action_text = get_card_action(card)
+                phrase_text = get_card_phrase(card)
 
                 if is_eval and not meta["red_unlocked"]:
-                    st.info("Avaliação: a modelagem breve fica recolhida por padrão para padronizar a aplicação.")
-                    if st.button("Desbloquear 🔴 (registrar uso)", key=f"unlock_red_{current_id}"):
+                    st.caption("Modo Avaliação: itens de modelagem ficam recolhidos por padrão.")
+                    if st.button("Liberar modelagem breve 🔴 (registrar uso)", key=f"unlock_red_{current_id}"):
                         meta["red_unlocked"] = True
-                        st.toast("🔴 desbloqueado (Avaliação)")
+                        st.toast("Modelagem breve 🔴 liberada (Avaliação)")
 
                 if (not is_eval) or meta["red_unlocked"]:
-                    red_options = []
-                    if action_text:
-                        red_options.append("Ação-alvo")
-                    if phrase_text:
-                        red_options.append("Frase-alvo")
-                    if not red_options:
-                        red_options = ["(sem modelo disponível)"]
+                    st.write("Ação sugerida (para intervenção):")
+                    st.write(action_text if action_text else "—")
 
-                    chosen_red = st.selectbox(
-                        "Escolher 🔴",
-                        red_options,
-                        key=f"sel_r_{current_id}"
-                    )
+                    st.write("Formulação sugerida (para intervenção):")
+                    st.write(phrase_text if phrase_text else "—")
 
-                    if chosen_red == "Ação-alvo":
-                        st.write("**Conteúdo:**", action_text)
-                    elif chosen_red == "Frase-alvo":
-                        st.write("**Conteúdo:**", phrase_text)
-                    else:
-                        st.write("**Conteúdo:** —")
-
-                    if st.button("Aplicar 🔴", key=f"btn_r_{current_id}", disabled=(chosen_red == "(sem modelo disponível)")):
-                        meta["prompts_red"] += 1
-                        st.toast("Uso de 🔴 registrado")
+                    colra, colrf = st.columns(2)
+                    with colra:
+                        if st.button("Registrar uso: ação 🔴", key=f"btn_red_action_{current_id}"):
+                            meta["prompts_red"] += 1
+                            st.toast("Uso de modelagem (ação) 🔴 registrado")
+                    with colrf:
+                        if st.button("Registrar uso: formulação 🔴", key=f"btn_red_phrase_{current_id}"):
+                            meta["prompts_red"] += 1
+                            st.toast("Uso de modelagem (formulação) 🔴 registrado")
 
             st.divider()
 
-            st.write("### Reformulação (limite 1)")
+            st.write("Reformulação (limite 1):")
             if meta["reformulations"] < 1:
                 if st.button("Registrar 1 reformulação", key=f"btn_ref_{current_id}"):
                     meta["reformulations"] += 1
                     st.toast("Reformulação registrada")
             else:
-                st.caption("Limite atingido. Use prompts graduados.")
+                st.caption("Limite atingido. Siga com perguntas de condução graduadas.")
 
             st.divider()
 
-            st.write("### Classificação da resposta do paciente")
+            st.write("Classificação da resposta do paciente:")
             meta["response_class"] = st.radio(
                 "Marcar como:",
                 ["Alvo", "Parcial", "Alternativa válida", "Inadequada"],
@@ -727,7 +705,7 @@ elif page == "Sessão":
                 )
 
             if card.get("needsAdult"):
-                st.warning(f"Encaminhar: {card.get('adultType', 'adulto responsável')}")
+                st.warning(f"Encaminhamento sugerido: {card.get('adultType', 'adulto responsável')}")
 
     with right:
         st.subheader("Pontuação")
@@ -758,7 +736,7 @@ elif page == "Sessão":
                 total=int(total),
                 notes=note.strip(),
 
-                # ✅ NOVO (UX padronização)
+                # ✅ mantém nomes no DB por compatibilidade
                 prompts_green=int(meta["prompts_green"]),
                 prompts_yellow=int(meta["prompts_yellow"]),
                 prompts_red=int(meta["prompts_red"]),
@@ -817,7 +795,6 @@ elif page == "Sessão":
         st.session_state.session_attempts = {}
         st.session_state.session_idx = 0
 
-        # ✅ opcional: limpa metas da sessão para não carregar contadores antigos
         for k in list(st.session_state.keys()):
             if str(k).startswith("meta_"):
                 del st.session_state[k]
@@ -860,7 +837,7 @@ elif page == "Relatórios":
     st.write("Média total:", round(df_att["total"].mean(), 2))
     st.write("Média de dicas (nível selecionado):", round(df_att["hint_level"].mean(), 2))
     if "prompts_red" in df_att.columns:
-        st.write("Média de 🔴 (modelagem breve usada):", round(df_att["prompts_red"].mean(), 2))
+        st.write("Média de modelagem breve (🔴):", round(df_att["prompts_red"].mean(), 2))
     if "response_class" in df_att.columns:
         st.write("% Alternativa válida:", round((df_att["response_class"] == "Alternativa válida").mean() * 100, 1), "%")
 
@@ -884,165 +861,5 @@ O aplicativo é uma ferramenta de treino e avaliação clínica de habilidades s
 - conduzir a conversa e observar repertórios;
 - registrar pontuação por domínios (detecção, pistas, empatia, ação etc.);
 - gerar histórico e relatórios.
-
-## 2) Papéis na sessão
-### Papel do terapeuta
-Você é o condutor e avaliador:
-- seleciona as cartas (planejamento clínico);
-- define o nível de ajuda (dicas);
-- faz perguntas, oferece pistas graduais e modela linguagem quando necessário;
-- observa e pontua o desempenho do paciente;
-- registra observações clínicas.
-
-### Papel do paciente
-O paciente é o respondente ativo:
-- descreve o que está vendo;
-- identifica emoções/pistas;
-- propõe o que fazer/dizer;
-- ajusta respostas conforme recebe dicas;
-- prática frases e ações alternativas.
-
-Em geral: o terapeuta regula o “nível de estrutura”; o paciente fornece o material (percepção + interpretação + resposta).
-
-## 3) Fluxo do app (o que cada página faz)
-### A) Pacientes
-Serve para:
-- criar um paciente com nome/código;
-- selecionar o “paciente ativo” para que a sessão e os relatórios fiquem vinculados.
-
-Boas práticas:
-- em “observações”, registre apenas dados clínicos necessários.
-
-### B) Sessão
-Aqui acontece a atividade.
-
-Passo a passo recomendado:
-1. Confirme o Paciente ativo (aparece no topo).
-2. Escolha o Modo (treino guiado / independente / avaliação).
-3. Defina o Nível de dicas usado nesta tentativa.
-4. Em Escolher cartas da sessão, selecione os IDs das cartas que você quer trabalhar.
-5. Use Anterior / Próxima para navegar nas cartas.
-6. Para cada carta:
-   - mostre o estímulo ao paciente;
-   - conduza a exploração;
-   - pontue e escreva observações;
-   - clique **Salvar tentativa desta carta**.
-7. Ao final, escreva **Notas da sessão** e clique **Salvar sessão**.
-
-Importante: “IDs (1,2,3…)” = cartas selecionadas pelo terapeuta.  
-“A, B, C” são as cenas/quadros dentro da carta (a sequência narrativa).
-
-### C) Relatórios
-Mostra o histórico do paciente com:
-- tentativas por carta;
-- médias;
-- tabela completa;
-- exportação em CSV.
-
-## 4) Roteiro clínico para usar em cada carta
-Use sempre do mais simples ao mais complexo:
-
-### Etapa 1 — Detecção (o que aconteceu?)
-Perguntas:
-- “O que está acontecendo aqui?”
-- “O que você vê primeiro?”
-- “Qual é o problema principal?”
-
-### Etapa 2 — Pistas (como você sabe?)
-Perguntas:
-- “O que na imagem te faz pensar isso?”
-- “Que sinais mostram isso? (olhos, boca, corpo, situação)”
-- “O que mudou do A para o B? e do B para o C?”
-
-### Etapa 3 — Empatia cognitiva (o que cada um pensa/sente?)
-Perguntas:
-- “Como a pessoa se sente?”
-- “O que ela pode estar pensando?”
-- “O que a outra pessoa entende da situação?”
-
-### Etapa 4 — Ação (o que fazer agora?)
-Perguntas:
-- “O que você faria se fosse você?”
-- “Qual seria uma ajuda boa aqui?”
-- “O que NÃO ajudaria?”
-
-### Etapa 5 — Comunicação (o que dizer?)
-Perguntas:
-- “O que você diria?”
-- “Como pedir ajuda?”
-- “Dá pra falar de um jeito mais calmo/mais claro?”
-
-### Etapa 6 — Segurança/Encaminhamento (quando precisa adulto?)
-Perguntas:
-- “Isso precisa de um adulto?”
-- “É perigoso? tem risco?”
-- “Qual adulto e por quê?”
-
-## 5) Como usar o “Nível de Dicas” (0–3)
-A ideia é padronizar para ficar comparável entre sessões.
-- **0 = Sem dicas:** paciente responde espontaneamente.
-- **1 = Dica leve:** pergunta orientadora (“olhe o rosto… o que te diz?”).
-- **2 = Dica moderada:** você aponta a pista (“veja o copo no chão… isso muda o quê?”).
-- **3 = Dica forte/modelagem:** você sugere estrutura de resposta ou oferece opções (“você pode dizer ‘vamos limpar juntos’ ou ‘posso ajudar?’”).
-
-Regra de ouro: anote o menor nível de dica que desbloqueou a resposta.
-
-## 6) Critérios de pontuação (como interpretar)
-Você já tem os dados por domínio. Para ficar consistente, use este “guia rápido”:
-
-### Detecção (0–2)
-- **0:** não entende o que aconteceu / descrição confusa  
-- **1:** entende parcialmente ou precisa de condução  
-- **2:** entende claramente e com precisão  
-
-### Pistas (0–2)
-- **0:** não usa pistas visuais/situacionais  
-- **1:** usa 1 pista ou vaga  
-- **2:** usa múltiplas pistas relevantes (detalhes + contexto)  
-
-### Empatia cognitiva (0–2)
-- **0:** não atribui estados mentais / respostas rígidas  
-- **1:** atribui um estado (“triste”) sem integração  
-- **2:** integra emoção + motivo + perspectiva do outro  
-
-### Ação (0–3)
-- **0:** não propõe ajuda / propõe ação inadequada  
-- **1:** ajuda genérica (“sei lá…”) ou incompleta  
-- **2:** ajuda adequada e funcional  
-- **3:** ajuda adequada + ajustada ao outro (timing/forma/alternativas)  
-
-### Comunicação (0–1)
-- **0:** não consegue formular frase adequada  
-- **1:** formula frase adequada e compreensível  
-
-### Segurança/Encaminhamento (0–2)
-- **0:** não reconhece risco/necessidade de adulto quando existe  
-- **1:** reconhece com ajuda  
-- **2:** reconhece sozinho e indica adulto/encaminhamento apropriado  
-
-## 7) O que registrar em “Observação clínica”
-Use frases curtas e úteis. Exemplos:
-- “Precisou de dica nível 2 para notar a pista X.”
-- “Respondeu com ação concreta, mas sem frase.”
-- “Empatia melhorou ao comparar A→B.”
-- “Rigidez: repetiu mesma resposta em cartas diferentes.”
-- “Boa generalização: transferiu estratégia de carta anterior.”
-
-## 8) Estrutura de sessão sugerida (15 a 30 min)
-- Aquecimento (2 min): 1 carta simples
-- Núcleo (10–20 min): 3–6 cartas (dependendo da tolerância)
-- Generalização (2–5 min): “isso acontece na vida real quando?”
-- Fechamento (1–2 min): reforço + resumo de estratégia (“hoje você… percebeu pistas e pediu ajuda assim…”)
-
-## 9) Mini “script” pronto para você falar (opcional)
-Você pode usar literalmente:
-
-“Vamos olhar essa cena. Primeiro você me diz o que aconteceu. Depois me mostra as pistas que te fizeram pensar isso. Em seguida, vamos pensar como cada pessoa está se sentindo e o que seria uma ajuda boa. No final, você treina uma frase que você diria.”
-
-## 10) Solucionando problemas clínicos (o que fazer quando trava)
-- Se o paciente só descreve objetos: peça mudança A→B→C (“o que mudou?”).
-- Se ele não fala emoções: ofereça duas opções (“parece triste ou com raiva?”).
-- Se dá resposta “certa” mas mecânica: pergunte “por quê?” e peça pistas.
-- Se acelera e erra: volte ao básico — “me mostra onde você viu isso”.
 """
     st.markdown(manual_md)
